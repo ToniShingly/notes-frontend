@@ -1,5 +1,5 @@
 import './App.css'
-import { AppShell, rem, Title, Group, Button, Center, Text } from '@mantine/core'
+import { AppShell, rem, Title, Group, Button, Center, Text, Container, Stack } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks';
 import NotesTable from './components/NotesTable';
 import EditNoteModal from './components/EditNoteModal';
@@ -74,11 +74,16 @@ function App() {
       <AppShell.Main
         pt={`calc(${rem(60)} + var(--mantine-spacing-md))`}
       >
-        <NotesTable notes={notes} onDelete={deleteNote} onEdit={handleEdit} isLoading={isLoading} />
-
-        <Button variant="default" onClick={handleCreate} mt="md" loading={isLoading}>
-          Добавить заметку
-        </Button>
+        <Container size="lg">
+          <Stack>
+            <NotesTable notes={notes} onDelete={deleteNote} onEdit={handleEdit} isLoading={isLoading} />
+            <Center>
+              <Button variant="default" onClick={handleCreate} loading={isLoading}>
+                Добавить заметку
+              </Button>
+            </Center>
+          </Stack>
+        </Container>
       </AppShell.Main>
     </AppShell>
   );
