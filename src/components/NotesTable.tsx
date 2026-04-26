@@ -2,21 +2,25 @@ import { useMemo } from 'react';
 import { MantineReactTable, useMantineReactTable, type MRT_ColumnDef } from 'mantine-react-table';
 import { ActionIcon, Flex, Tooltip } from '@mantine/core';
 import { IconEdit, IconTrash } from '@tabler/icons-react';
-import type { Note } from '../App';
+import type { Note } from '../types/note';
 
 interface NotesTableProps {
   notes: Note[];
-  onDelete: (id: string) => void;
+  onDelete: (id: number) => void;
   onEdit: (note: Note) => void;
+  isLoading: boolean;
 }
 
-export default function NotesTable({ notes, onDelete, onEdit }: NotesTableProps) {
+export default function NotesTable({ notes, onDelete, onEdit, isLoading }: NotesTableProps) {
   const columns = useMemo<MRT_ColumnDef<Note>[]>(
     () => [
       {
-        accessorKey: 'dateCreated',
+        accessorKey: 'created_at',
         header: 'Дата создания',
-        Cell: ({ cell }) => (cell.getValue() as Date).toLocaleDateString(),
+        Cell: ({ cell }) => {
+          const date = cell.getValue<string>();
+          return date ? new Date(date).toLocaleDateString() : '-';
+        },
       },
       {
         accessorKey: 'text',
@@ -26,8 +30,8 @@ export default function NotesTable({ notes, onDelete, onEdit }: NotesTableProps)
         accessorKey: 'deadline',
         header: 'Дедлайн',
         Cell: ({ cell }) => {
-          const val = cell.getValue() as Date | null;
-          return val ? val.toLocaleDateString() : '-';
+          const val = cell.getValue<string>();
+          return val ? new Date(val).toLocaleDateString() : '-';
         },
       },
     ],
@@ -37,6 +41,7 @@ export default function NotesTable({ notes, onDelete, onEdit }: NotesTableProps)
   const table = useMantineReactTable({
     columns,
     data: notes,
+    state: {isLoading},
     enableRowActions: true,
     positionActionsColumn: 'last',
     displayColumnDefOptions: {

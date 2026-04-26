@@ -1,49 +1,39 @@
 import './App.css'
-import { AppShell, rem, Title, Group, Button } from '@mantine/core'
+import { AppShell, rem, Title, Group, Button, Center, Text } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks';
 import NotesTable from './components/NotesTable';
 import EditNoteModal from './components/EditNoteModal';
 import { useState } from 'react';
-
-export type Note = {
-  id: string;
-  text: string;
-  dateCreated: Date;
-  deadline: Date | null;
-};
+import type { Note } from './types/note';
+import { useNotes } from './hooks/useNotes';
+import { noteService } from './services/api';
 
 function App() {
   const [modalOpened, { open, close }] = useDisclosure(false);
-
-  const [notes, setNotes] = useState<Note[]>([
-    {
-      id: '1',
-      text: 'Заметка 1',
-      dateCreated: new Date(),
-      deadline: new Date(new Date().getTime() + 86400000),
-    },
-  ]);
-
   const [editingNote, setEditingNote] = useState<Note | null>(null);
 
-  const addOrUpdateNote = (data: { text: string; deadline: Date | null }) => {
-    if (editingNote) {
-      setNotes((prev) =>
-        prev.map((n) => (n.id === editingNote.id ? { ...n, ...data } : n))
-      );
-    } else {
-      const newNote: Note = {
-        ...data,
-        id: Math.random().toString(36).substr(2, 9),
-        dateCreated: new Date(),
-      };
-      setNotes((prev) => [...prev, newNote]);
+  const { data: notes, isLoading, isError, deleteNote, fetchNotes } = useNotes();
+
+  const addOrUpdateNote = async (data: { text: string; deadline: Date | null }) => {
+    const payload = {
+      text: data.text,
+      deadline: data.deadline ? data.deadline.toISOString() : null,
+    };
+
+    try {
+      if (editingNote) {
+        await noteService.updateNote(editingNote.id, payload);
+      } else {
+        await noteService.createNote(payload);
+      }
+      fetchNotes();
+      handleClose();
+    } catch (error) {
+      alert('Ошибка при сохранении');
     }
-    handleClose();
   };
 
   const handleEdit = (note: Note) => {
-    setEditingNote(null);
     setEditingNote(note);
     open();
   };
@@ -57,9 +47,13 @@ function App() {
     close();
   };
 
-  const deleteNote = (id: string) => {
-    setNotes((prev) => prev.filter((n) => n.id !== id));
-  };
+  if (isError) {
+    return (
+      <Center h="100vh">
+        <Text color="red">Не удалось соединиться с бэкендом. Проверь Rails сервер!</Text>
+      </Center>
+    );
+  }
 
   return (
     <AppShell
@@ -80,9 +74,9 @@ function App() {
       <AppShell.Main
         pt={`calc(${rem(60)} + var(--mantine-spacing-md))`}
       >
-        <NotesTable notes={notes} onDelete={deleteNote} onEdit={handleEdit} />
-        
-        <Button variant="default" onClick={handleCreate} mt="md">
+        <NotesTable notes={notes} onDelete={deleteNote} onEdit={handleEdit} isLoading={isLoading} />
+
+        <Button variant="default" onClick={handleCreate} mt="md" loading={isLoading}>
           Добавить заметку
         </Button>
       </AppShell.Main>
