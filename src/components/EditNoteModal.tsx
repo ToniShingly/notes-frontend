@@ -1,7 +1,7 @@
 import { Modal, Button, Textarea, Stack, Group } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { useState, useEffect } from 'react';
-import type { Note } from '../App';
+import type { Note } from '../types/note';
 
 interface EditNoteModalProps {
     opened: boolean;
@@ -44,7 +44,8 @@ export default function EditNoteModal({ opened, onClose, onSave, initialData }: 
                     value={text}
                     onChange={(e) => setText(e.currentTarget.value)}
                     autosize
-                    minRows={4}
+                    minRows={8}
+                    maxRows={12}
                 />
                 <DateInput
                     label="Дедлайн"

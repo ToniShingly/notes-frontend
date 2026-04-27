@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { MantineReactTable, useMantineReactTable, type MRT_ColumnDef } from 'mantine-react-table';
-import { ActionIcon, Flex, Tooltip } from '@mantine/core';
+import { ActionIcon, Flex, Tooltip, Text } from '@mantine/core';
 import { IconEdit, IconTrash } from '@tabler/icons-react';
 import type { Note } from '../types/note';
 
@@ -17,18 +17,32 @@ export default function NotesTable({ notes, onDelete, onEdit, isLoading }: Notes
       {
         accessorKey: 'created_at',
         header: 'Дата создания',
+        size: 100,
+        grow: 1,
         Cell: ({ cell }) => {
-          const date = cell.getValue<string>();
+          const date = cell.getValue<any>();
           return date ? new Date(date).toLocaleDateString() : '-';
         },
       },
       {
         accessorKey: 'text',
         header: 'Текст заметки',
+        size: 300,
+        grow: 3,
+        Cell: ({ cell }) => {
+          const content = cell.getValue<string>() || '';
+          return (
+            <Text size="sm" truncate="end">
+              {content}
+            </Text>
+          );
+        },
       },
       {
         accessorKey: 'deadline',
         header: 'Дедлайн',
+        size: 100,
+        grow: 1,
         Cell: ({ cell }) => {
           const val = cell.getValue<string>();
           return val ? new Date(val).toLocaleDateString() : '-';
@@ -41,13 +55,15 @@ export default function NotesTable({ notes, onDelete, onEdit, isLoading }: Notes
   const table = useMantineReactTable({
     columns,
     data: notes,
-    state: {isLoading},
+    state: { isLoading },
+    layoutMode: 'grid',
     enableRowActions: true,
     positionActionsColumn: 'last',
     displayColumnDefOptions: {
       'mrt-row-actions': {
         header: 'Действия',
         size: 100,
+        grow: 1,
       },
     },
     renderRowActions: ({ row }) => (
