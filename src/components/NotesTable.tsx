@@ -79,9 +79,7 @@ export default function NotesTable({ notes, onDelete, onEdit, isLoading }: Notes
             variant="light"
             color="red"
             onClick={() => {
-              if (window.confirm('Удалить заметку?')) {
-                onDelete(row.original.id);
-              }
+              onDelete(row.original.id);
             }}
           >
             <IconTrash size={18} />
