@@ -1,5 +1,15 @@
-import './App.css'
-import { AppShell, rem, Title, Group, Button, Center, Text, Container, Stack } from '@mantine/core'
+import './App.css';
+import {
+  AppShell,
+  rem,
+  Title,
+  Group,
+  Button,
+  Center,
+  Text,
+  Container,
+  Stack,
+} from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import NotesTable from './components/NotesTable';
@@ -8,14 +18,24 @@ import { useState } from 'react';
 import type { Note } from './types/note';
 import { useNotes } from './hooks/useNotes';
 import { noteService } from './services/api';
+import axios, { AxiosError } from 'axios';
 
 function App() {
   const [modalOpened, { open, close }] = useDisclosure(false);
   const [editingNote, setEditingNote] = useState<Note | null>(null);
 
-  const { data: notes, isLoading, isError, deleteNote, fetchNotes } = useNotes();
+  const {
+    data: notes,
+    isLoading,
+    isError,
+    deleteNote,
+    fetchNotes,
+  } = useNotes();
 
-  const addOrUpdateNote = async (data: { text: string; deadline: Date | null }) => {
+  const addOrUpdateNote = async (data: {
+    text: string;
+    deadline: Date | null;
+  }) => {
     const payload = {
       text: data.text,
       deadline: data.deadline ? data.deadline.toISOString() : null,
@@ -35,8 +55,10 @@ function App() {
       const serverErrors = error.response?.data?.errors;
       notifications.show({
         title: 'Ошибка',
-        message: Array.isArray(serverErrors) ? serverErrors.join('. ') : 'Ошибка при сохранении',
-        color: 'red'
+        message: Array.isArray(serverErrors)
+          ? serverErrors.join('. ')
+          : 'Ошибка при сохранении',
+        color: 'red',
       });
     }
   };
@@ -58,16 +80,15 @@ function App() {
   if (isError) {
     return (
       <Center h="100vh">
-        <Text color="red">Не удалось соединиться с бэкендом. Проверь Rails сервер!</Text>
+        <Text color="red">
+          Не удалось соединиться с бэкендом. Проверь Rails сервер!
+        </Text>
       </Center>
     );
   }
 
   return (
-    <AppShell
-      header={{ height: 60, offset: false }}
-      padding="md"
-    >
+    <AppShell header={{ height: 60, offset: false }} padding="md">
       <EditNoteModal
         opened={modalOpened}
         onClose={handleClose}
@@ -79,14 +100,21 @@ function App() {
           <Title order={1}>Заметки</Title>
         </Group>
       </AppShell.Header>
-      <AppShell.Main
-        pt={`calc(${rem(60)} + var(--mantine-spacing-md))`}
-      >
+      <AppShell.Main pt={`calc(${rem(60)} + var(--mantine-spacing-md))`}>
         <Container size="lg">
           <Stack>
-            <NotesTable notes={notes} onDelete={deleteNote} onEdit={handleEdit} isLoading={isLoading} />
+            <NotesTable
+              notes={notes}
+              onDelete={deleteNote}
+              onEdit={handleEdit}
+              isLoading={isLoading}
+            />
             <Center>
-              <Button variant="default" onClick={handleCreate} loading={isLoading}>
+              <Button
+                variant="default"
+                onClick={handleCreate}
+                loading={isLoading}
+              >
                 Добавить заметку
               </Button>
             </Center>
@@ -97,4 +125,4 @@ function App() {
   );
 }
 
-export default App
+export default App;

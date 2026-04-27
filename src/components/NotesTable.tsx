@@ -1,5 +1,9 @@
 import { useMemo } from 'react';
-import { MantineReactTable, useMantineReactTable, type MRT_ColumnDef } from 'mantine-react-table';
+import {
+  MantineReactTable,
+  useMantineReactTable,
+  type MRT_ColumnDef,
+} from 'mantine-react-table';
 import { ActionIcon, Flex, Tooltip, Text } from '@mantine/core';
 import { IconEdit, IconTrash } from '@tabler/icons-react';
 import type { Note } from '../types/note';
@@ -11,7 +15,12 @@ interface NotesTableProps {
   isLoading: boolean;
 }
 
-export default function NotesTable({ notes, onDelete, onEdit, isLoading }: NotesTableProps) {
+export default function NotesTable({
+  notes,
+  onDelete,
+  onEdit,
+  isLoading,
+}: NotesTableProps) {
   const columns = useMemo<MRT_ColumnDef<Note>[]>(
     () => [
       {
@@ -69,7 +78,11 @@ export default function NotesTable({ notes, onDelete, onEdit, isLoading }: Notes
     renderRowActions: ({ row }) => (
       <Flex gap="xs">
         <Tooltip label="Редактировать">
-          <ActionIcon variant="light" color="blue" onClick={() => onEdit(row.original)}>
+          <ActionIcon
+            variant="light"
+            color="blue"
+            onClick={() => onEdit(row.original)}
+          >
             <IconEdit size={18} />
           </ActionIcon>
         </Tooltip>
