@@ -1,6 +1,7 @@
 import './App.css'
 import { AppShell, rem, Title, Group, Button, Center, Text, Container, Stack } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks';
+import { notifications } from '@mantine/notifications';
 import NotesTable from './components/NotesTable';
 import EditNoteModal from './components/EditNoteModal';
 import { useState } from 'react';
@@ -23,13 +24,20 @@ function App() {
     try {
       if (editingNote) {
         await noteService.updateNote(editingNote.id, payload);
+        notifications.show({ message: 'Заметка обновлена', color: 'green' });
       } else {
         await noteService.createNote(payload);
+        notifications.show({ message: 'Заметка создана', color: 'green' });
       }
       fetchNotes();
       handleClose();
-    } catch (error) {
-      alert('Ошибка при сохранении');
+    } catch (error: any) {
+      const serverErrors = error.response?.data?.errors;
+      notifications.show({
+        title: 'Ошибка',
+        message: Array.isArray(serverErrors) ? serverErrors.join('. ') : 'Ошибка при сохранении',
+        color: 'red'
+      });
     }
   };
 
