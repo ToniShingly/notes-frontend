@@ -18,7 +18,7 @@ import { useState } from 'react';
 import type { Note } from './types/note';
 import { useNotes } from './hooks/useNotes';
 import { noteService } from './services/api';
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 
 function App() {
   const [modalOpened, { open, close }] = useDisclosure(false);
@@ -51,13 +51,18 @@ function App() {
       }
       fetchNotes();
       handleClose();
-    } catch (error: any) {
-      const serverErrors = error.response?.data?.errors;
+    } catch (error: unknown) {
+      let errorMessage = 'Ошибка при сохранении';
+      if (axios.isAxiosError(error)) {
+        const serverErrors = error.response?.data?.errors;
+        if (Array.isArray(serverErrors)) {
+          errorMessage = serverErrors.join('. ');
+        }
+      }
+
       notifications.show({
         title: 'Ошибка',
-        message: Array.isArray(serverErrors)
-          ? serverErrors.join('. ')
-          : 'Ошибка при сохранении',
+        message: errorMessage,
         color: 'red',
       });
     }
@@ -90,6 +95,7 @@ function App() {
   return (
     <AppShell header={{ height: 60, offset: false }} padding="md">
       <EditNoteModal
+        key={editingNote ? editingNote.id : modalOpened ? 'open' : 'closed'}
         opened={modalOpened}
         onClose={handleClose}
         onSave={addOrUpdateNote}

@@ -29,7 +29,7 @@ export default function NotesTable({
         size: 100,
         grow: 1,
         Cell: ({ cell }) => {
-          const date = cell.getValue<any>();
+          const date = cell.getValue<string>();
           return date ? new Date(date).toLocaleDateString() : '-';
         },
       },

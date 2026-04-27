@@ -1,6 +1,6 @@
 import { Modal, Button, Textarea, Stack, Group } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import type { Note } from '../types/note';
 
 interface EditNoteModalProps {
@@ -15,18 +15,10 @@ export default function EditNoteModal({
   onSave,
   initialData,
 }: EditNoteModalProps) {
-  const [text, setText] = useState('');
-  const [deadline, setDeadline] = useState<Date | null>(null);
-
-  useEffect(() => {
-    if (initialData) {
-      setText(initialData.text);
-      setDeadline(initialData.deadline);
-    } else {
-      setText('');
-      setDeadline(null);
-    }
-  }, [initialData, opened]);
+  const [text, setText] = useState(initialData?.text ?? '');
+  const [deadline, setDeadline] = useState<Date | null>(
+    initialData?.deadline ?? null,
+  );
 
   const handleSave = () => {
     if (!text.trim()) return;
